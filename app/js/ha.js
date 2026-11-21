@@ -269,11 +269,19 @@ export function loadAuth() {
 }
 
 export function saveAuth(auth) {
-  localStorage.setItem(AUTH_KEY, JSON.stringify(auth));
+  try {
+    localStorage.setItem(AUTH_KEY, JSON.stringify(auth));
+  } catch {
+    /* storage unavailable: stay logged in for this page load only */
+  }
 }
 
 export function clearAuth() {
-  localStorage.removeItem(AUTH_KEY);
+  try {
+    localStorage.removeItem(AUTH_KEY);
+  } catch {
+    /* ignore */
+  }
 }
 
 export function normalizeUrl(url) {
@@ -292,6 +300,7 @@ function redirectUri() {
 
 /** Redirect the browser to Home Assistant's login page. */
 export function startOAuthLogin(hassUrl) {
+  if (window.HA_APP_DEMO?.login) return window.HA_APP_DEMO.login(hassUrl);
   const state = btoa(JSON.stringify({ hassUrl, clientId: defaultClientId() }));
   const qs = new URLSearchParams({
     response_type: 'code',

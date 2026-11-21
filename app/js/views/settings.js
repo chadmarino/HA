@@ -4,11 +4,36 @@ import { h } from '../dom.js';
 import { store, savePrefs, notify } from '../store.js';
 import { normalizeUrl, startOAuthLogin } from '../ha.js';
 
+// Only touch data-theme when we set it, so a theme chosen by a host page (e.g. when embedded) is kept.
+let themeSetByApp = false;
 export function applyTheme() {
   const t = store.prefs.theme;
-  if (t === 'auto') document.documentElement.removeAttribute('data-theme');
-  else document.documentElement.setAttribute('data-theme', t);
+  const root = document.documentElement;
+  if (t === 'auto') {
+    if (themeSetByApp) root.removeAttribute('data-theme');
+    themeSetByApp = false;
+  } else {
+    root.setAttribute('data-theme', t);
+    themeSetByApp = true;
+  }
 }
+
+const lastUrl = {
+  get() {
+    try {
+      return localStorage.getItem('ha-app-last-url') || '';
+    } catch {
+      return '';
+    }
+  },
+  set(u) {
+    try {
+      localStorage.setItem('ha-app-last-url', u);
+    } catch {
+      /* ignore */
+    }
+  },
+};
 
 export function settingsView(root, { auth, onLogout }) {
   const theme = h(
@@ -52,7 +77,7 @@ export function settingsView(root, { auth, onLogout }) {
 
 export function loginScreen(root, { error, onToken }) {
   const servedFromHA = /\/local\//.test(location.pathname);
-  const url = h('input', { type: 'url', required: true, placeholder: 'http://homeassistant.local:8123', value: servedFromHA ? location.origin : localStorage.getItem('ha-app-last-url') || '', 'aria-label': 'Home Assistant URL' });
+  const url = h('input', { type: 'url', required: true, placeholder: 'http://homeassistant.local:8123', value: window.HA_APP_DEMO?.url || (servedFromHA ? location.origin : lastUrl.get()), 'aria-label': 'Home Assistant URL' });
   const token = h('textarea', { rows: 3, placeholder: 'Paste a long-lived access token', 'aria-label': 'Access token', class: 'code' });
   const err = h('p', { class: 'error', hidden: !error }, error || '');
   const getUrl = () => {
@@ -62,7 +87,7 @@ export function loginScreen(root, { error, onToken }) {
       err.hidden = false;
       return null;
     }
-    localStorage.setItem('ha-app-last-url', u);
+    lastUrl.set(u);
     return u;
   };
   root.append(

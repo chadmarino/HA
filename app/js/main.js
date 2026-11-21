@@ -19,13 +19,13 @@ const VIEWS = {
   home: { label: 'Home', icon: '🏠', render: homeView },
   automations: { label: 'Automations', icon: '🤖', render: automationsView },
   tools: { label: 'Tools', icon: '🛠️', render: toolsView, admin: true },
-  settings: { label: 'Settings', icon: '⚙️', render: (root) => settingsView(root, { auth, onLogout: logout }) },
+  prefs: { label: 'Settings', icon: '⚙️', render: (root) => settingsView(root, { auth, onLogout: logout }) },
 };
 
 async function start() {
   let error = null;
   try {
-    auth = (await handleOAuthCallback()) || loadAuth() || importFrontendTokens();
+    auth = window.HA_APP_DEMO?.auth || (await handleOAuthCallback()) || loadAuth() || importFrontendTokens();
   } catch (e) {
     error = e.message;
   }
@@ -40,6 +40,7 @@ function showLogin(error) {
     error,
     onToken: async (hassUrl, token) => {
       auth = { mode: 'token', hassUrl, access_token: token };
+      if (window.HA_APP_DEMO) window.HA_APP_DEMO.auth = auth;
       saveAuth(auth);
       await connect();
     },
@@ -51,6 +52,7 @@ function logout() {
   store.conn?.close();
   clearAuth();
   auth = null;
+  if (window.HA_APP_DEMO) window.HA_APP_DEMO.auth = null;
   showLogin();
 }
 
@@ -124,8 +126,8 @@ function renderShell() {
   statusEl = h('span', { class: 'status online', title: 'Connected' });
   const nav = h('nav', { class: 'tabs', 'aria-label': 'Main' });
   const main = h('main', { id: 'view' });
-  const header = h('header', { class: 'top' }, h('img', { src: 'icon.svg', alt: '', width: 28, height: 28 }), h('h1', null, store.config?.location_name || 'Home'), statusEl);
-  app.append(header, main, nav);
+  const header = h('header', { class: 'top' }, h('img', { src: 'icon.svg', alt: '', width: 28, height: 28 }), h('h1', null, store.config?.location_name || 'Home'), statusEl, nav);
+  app.append(header, main);
 
   for (const [key, v] of Object.entries(VIEWS)) {
     if (v.admin && !store.isAdmin) continue;

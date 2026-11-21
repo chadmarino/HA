@@ -17,6 +17,7 @@ export const store = {
 
 function loadPrefs() {
   const defaults = { favorites: [], showHidden: false, theme: 'auto', lastView: 'home' };
+  if (typeof window !== 'undefined' && window.HA_APP_DEMO) return defaults;
   try {
     return { ...defaults, ...(JSON.parse(localStorage.getItem(PREFS_KEY)) || {}) };
   } catch {

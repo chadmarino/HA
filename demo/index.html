@@ -1,0 +1,21 @@
+<title>HA App Demo</title>
+<meta name="theme-color" content="#0f766e">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/app.css">
+<style>
+  .demo-banner {
+    display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; justify-content: center;
+    padding-block: 6px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    background: var(--surface-2); color: var(--muted);
+    font-size: 12px; text-align: center; border-bottom: 1px solid var(--border);
+  }
+  .demo-banner strong { color: var(--text); font-weight: 600; }
+</style>
+<div class="demo-banner"><strong>Demo</strong><span>A simulated home, so everything works but nothing is real. Changes reset when you reload.</span></div>
+<div id="app"><div class="splash"><div class="spinner"></div></div></div>
+<script type="module">
+  import './demo/browser.js';
+  import './js/main.js';
+</script>

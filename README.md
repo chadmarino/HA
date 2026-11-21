@@ -75,7 +75,7 @@ npm run dev     # fake Home Assistant + the app at http://localhost:8123/local/h
 npm test        # end-to-end tests in headless Chromium against the mock server
 ```
 
-`tools/mock-ha.mjs` simulates enough of HA for the tests: the WebSocket API, the config REST API, and OAuth.
+The simulated house and API logic live in `demo/mock-core.js`. `tools/mock-ha.mjs` serves it over real HTTP and WebSockets for development and tests. `demo/` runs the same simulation inside the page, which is how the published click-through demo works.
 
 ### Layout
 
@@ -87,6 +87,9 @@ app/                  ← everything that gets deployed
   js/cards.js         device cards and their controls
   js/views/*.js       home, details, automations, tools, settings and login
   vendor/js-yaml.mjs  YAML parser (MIT)
+demo/mock-core.js     simulated house and HA APIs (shared)
+demo/browser.js       in-page fake WebSocket/fetch for the browser demo
+demo/index.html       demo page
 tools/mock-ha.mjs     mock Home Assistant server
 tools/e2e.mjs         Playwright end-to-end tests
 tools/deploy.sh       copy app/ to /config/www/ha-app over SSH

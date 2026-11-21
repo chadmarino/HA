@@ -1,0 +1,15 @@
+{
+  "name": "ha-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A custom Home Assistant control app (dependency-free web app / PWA)",
+  "type": "module",
+  "scripts": {
+    "dev": "node tools/mock-ha.mjs",
+    "test": "node tools/e2e.mjs"
+  },
+  "devDependencies": {
+    "js-yaml": "4.1.0",
+    "ws": "8.18.0"
+  }
+}
